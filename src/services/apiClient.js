@@ -1,4 +1,4 @@
-const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || '').replace(/\/$/, '')
+const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || '/api').replace(/\/$/, '')
 const AUTH_TOKEN_KEY = 'minibanking.accessToken'
 
 /** API error with HTTP status and parsed backend response for user-facing handling. */
