@@ -1,10 +1,10 @@
 import { useEffect, useMemo, useState } from 'react'
 import { FiArrowUpRight, FiChevronRight, FiCreditCard, FiGrid, FiLogOut, FiMenu, FiSearch, FiUserPlus, FiUsers } from 'react-icons/fi'
-import { useAuth } from '../context/useAuth.js'
-import { AdminApiError, api } from '../api/adminApi.js'
-import { formatCurrency } from '../utils/formatters.js'
-import { validateRegistration } from '../utils/validation.js'
-import '../App.css'
+import { useAuth } from '../../context/useAuth.js'
+import { AdminApiError, api } from '../services/adminApi.js'
+import { formatCurrency } from '../../utils/formatters.js'
+import { validateRegistration } from '../../utils/validation.js'
+import '../../admin_styles/admin.css'
 
 const PAGE_SIZE = 10
 const EMPTY_ROWS = []
@@ -31,11 +31,11 @@ function formatDate(value) {
   return Number.isNaN(date.getTime()) ? '—' : new Intl.DateTimeFormat(undefined, { dateStyle: 'medium' }).format(date)
 }
 
-function StatCard({ icon, label, value, note, tint }) {
+function StatCard({ icon, label, value, tint }) {
   return (
     <article className="stat-card">
       <span className={`stat-icon ${tint}`}><Icon name={icon} size={21} /></span>
-      <div><p className="stat-label">{label}</p><strong>{value}</strong><p className="stat-note">{note}</p></div>
+      <div><p className="stat-label">{label}</p><strong>{value}</strong></div>
     </article>
   )
 }
@@ -118,6 +118,8 @@ function CreateAdminForm({ token }) {
 function AdminDashboard() {
   const { accessToken: token, logout, isSuperAdmin } = useAuth()
   const [activeView, setActiveView] = useState('overview')
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(() => window.localStorage.getItem('minibanking.adminSidebarCollapsed') === 'true')
+  const [mobileNavOpen, setMobileNavOpen] = useState(false)
   const [usersPage, setUsersPage] = useState(0)
   const [accountsPage, setAccountsPage] = useState(0)
   const [users, setUsers] = useState(null)
@@ -192,22 +194,30 @@ function AdminDashboard() {
   const isAccounts = activeView === 'accounts'
   const isCreateAdmin = activeView === 'create-admin'
 
+  function toggleSidebar() {
+    const nextCollapsed = !sidebarCollapsed
+    setSidebarCollapsed(nextCollapsed)
+    window.localStorage.setItem('minibanking.adminSidebarCollapsed', String(nextCollapsed))
+  }
+
   return (
-    <div className="admin-app">
-      <aside className="sidebar">
-        <a className="brand" href="#overview" onClick={() => setActiveView('overview')}><span className="brand-mark">M</span><span>Minibank<span className="brand-sub">ADMIN PORTAL</span></span></a>
+    <div className={`admin-app${sidebarCollapsed ? ' is-sidebar-collapsed' : ''}`}>
+      <aside className={`sidebar${mobileNavOpen ? ' mobile-open' : ''}`}>
+        <a className="brand" href="#overview" onClick={() => { setActiveView('overview'); setMobileNavOpen(false) }}><span className="brand-mark">M</span><span>Minibank<span className="brand-sub">ADMIN PORTAL</span></span></a>
         <nav className="side-nav" aria-label="Admin navigation">
-          <button className={activeView === 'overview' ? 'nav-item active' : 'nav-item'} onClick={() => { setActiveView('overview'); setSearch('') }}><Icon name="grid" />Overview</button>
-          <button className={isUsers ? 'nav-item active' : 'nav-item'} onClick={() => { setActiveView('users'); setSearch('') }}><Icon name="people" />Customers</button>
-          <button className={isAccounts ? 'nav-item active' : 'nav-item'} onClick={() => { setActiveView('accounts'); setSearch('') }}><Icon name="wallet" />Accounts</button>
-          {isSuperAdmin && <button className={isCreateAdmin ? 'nav-item active' : 'nav-item'} onClick={() => setActiveView('create-admin')}><Icon name="create" />Create administrator</button>}
+          <button aria-label="Overview" title="Overview" className={activeView === 'overview' ? 'nav-item active' : 'nav-item'} onClick={() => { setActiveView('overview'); setSearch(''); setMobileNavOpen(false) }}><Icon name="grid" /><span>Overview</span></button>
+          <button aria-label="Customers" title="Customers" className={isUsers ? 'nav-item active' : 'nav-item'} onClick={() => { setActiveView('users'); setSearch(''); setMobileNavOpen(false) }}><Icon name="people" /><span>Customers</span></button>
+          <button aria-label="Accounts" title="Accounts" className={isAccounts ? 'nav-item active' : 'nav-item'} onClick={() => { setActiveView('accounts'); setSearch(''); setMobileNavOpen(false) }}><Icon name="wallet" /><span>Accounts</span></button>
+          {isSuperAdmin && <button aria-label="Create administrator" title="Create administrator" className={isCreateAdmin ? 'nav-item active' : 'nav-item'} onClick={() => { setActiveView('create-admin'); setMobileNavOpen(false) }}><Icon name="create" /><span>Create administrator</span></button>}
         </nav>
-        <div className="sidebar-footer"><div className="secure-badge"><span className="secure-dot" />Secure admin session</div><button className="nav-item logout-button" onClick={handleLogout}><Icon name="logout" />Sign out</button></div>
+        <div className="sidebar-footer"><button aria-label="Sign out" title="Sign out" className="nav-item logout-button" onClick={handleLogout}><Icon name="logout" /><span>Sign out</span></button></div>
       </aside>
+      {mobileNavOpen && <button className="admin-backdrop" type="button" aria-label="Close navigation" onClick={() => setMobileNavOpen(false)} />}
 
       <main className="main-area">
         <header className="topbar">
-          <button className="mobile-menu" aria-label="Open navigation"><Icon name="menu" /></button>
+          <button className="sidebar-toggle" type="button" onClick={toggleSidebar} aria-label={sidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'} aria-expanded={!sidebarCollapsed}><Icon name="menu" /></button>
+          <button className="mobile-menu" type="button" onClick={() => setMobileNavOpen(true)} aria-label="Open navigation"><Icon name="menu" /></button>
           <div className="breadcrumb"><strong>{isUsers ? 'Customers' : isAccounts ? 'Accounts' : isCreateAdmin ? 'Create administrator' : 'Overview'}</strong></div>
           <div className="topbar-actions"><span className="admin-avatar">A</span><div className="admin-label"><strong>Administrator</strong><span>Bank operations</span></div></div>
         </header>
@@ -215,15 +225,14 @@ function AdminDashboard() {
         <div className="content-wrap">
           <div className="page-heading">
             <div><p className="eyebrow">BANK OPERATIONS</p><h1>{isUsers ? 'Customers' : isAccounts ? 'Accounts' : isCreateAdmin ? 'Create administrator' : 'Overview'}</h1><p className="muted">{isUsers ? 'Review registered customers from your banking system.' : isAccounts ? 'Monitor customer accounts and current balances.' : isCreateAdmin ? 'Provision access for a new administrator.' : 'A summary of your banking system.'}</p></div>
-            <div className="today-chip"><span className="live-dot" />System overview</div>
           </div>
 
           {error && <div className="alert alert-error" role="alert"><span>{error}</span><button onClick={() => setError('')}>Dismiss</button></div>}
 
           <section className="stats-grid" aria-label="Banking summary">
-            <StatCard icon="people" tint="purple" label="Registered customers" value={users ? Number(users.totalElements || 0).toLocaleString() : '—'} note="Total customers" />
-            <StatCard icon="wallet" tint="blue" label="Bank accounts" value={accounts ? Number(accounts.totalElements || 0).toLocaleString() : '—'} note="Total accounts" />
-            <StatCard icon="arrow" tint="green" label="Balance on this page" value={accounts ? formatCurrency(pageBalance) : '—'} note={`${accountRows.length} account records loaded`} />
+            <StatCard icon="people" tint="purple" label="Registered customers" value={users ? Number(users.totalElements || 0).toLocaleString() : '—'} />
+            <StatCard icon="wallet" tint="blue" label="Bank accounts" value={accounts ? Number(accounts.totalElements || 0).toLocaleString() : '—'} />
+            <StatCard icon="arrow" tint="green" label="Balance on this page" value={accounts ? formatCurrency(pageBalance) : '—'} />
           </section>
 
           {loading && <div className="loading-bar" role="status">Refreshing live data…</div>}
@@ -252,7 +261,6 @@ function AdminDashboard() {
           )}
 
           {isCreateAdmin && isSuperAdmin && <CreateAdminForm token={token} />}
-          <footer className="footer-note">Mini Banking System</footer>
         </div>
       </main>
     </div>

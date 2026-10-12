@@ -2,8 +2,8 @@ import { useState } from 'react'
 import { FiEye, FiEyeOff } from 'react-icons/fi'
 import { Link, useNavigate } from 'react-router-dom'
 import AuthLayout from '../components/AuthLayout.jsx'
-import { useAuth } from '../context/useAuth.js'
-import { validateRegistration } from '../utils/validation.js'
+import { useAuth } from '../../context/useAuth.js'
+import { validateRegistration } from '../../utils/validation.js'
 
 const INITIAL_VALUES = { fullName: '', email: '', phoneNumber: '', password: '', confirmPassword: '' }
 
@@ -64,7 +64,7 @@ export default function RegisterPage() {
       footer={<>Already registered? <Link to="/login">Sign in</Link></>}
     >
       {formError && <div className="auth-error" role="alert">{formError}</div>}
-      <div className="auth-notice" role="note">Public registration creates a USER account. ADMIN accounts must be provisioned from the protected admin dashboard.</div>
+      <div className="auth-notice" role="note">.</div>
       <form className="auth-form register-form" onSubmit={handleSubmit} noValidate>
         <label className="auth-field" htmlFor="register-name">Full name
           <input id="register-name" name="fullName" type="text" autoComplete="name" maxLength={150} value={values.fullName} onChange={(event) => updateField('fullName', event.target.value)} aria-invalid={Boolean(errors.fullName)} aria-describedby={errors.fullName ? 'register-name-error' : undefined} />
@@ -83,10 +83,25 @@ export default function RegisterPage() {
           {errors.password && <span className="field-error" id="register-password-error">{errors.password}</span>}
         </label>
         <label className="auth-field" htmlFor="register-confirm-password">Confirm password
-          <span className="password-control"><input id="register-confirm-password" name="confirmPassword" type={showConfirmPassword ? 'text' : 'password'} autoComplete="new-password" value={values.confirmPassword} onChange={(event) => updateField('confirmPassword', event.target.value)} aria-invalid={Boolean(errors.confirmPassword)} aria-describedby={errors.confirmPassword ? 'register-confirm-error' : undefined} /><button className="password-toggle" type="button" onClick={() => setShowConfirmPassword((visible) => !visible)} aria-label={showConfirmPassword ? 'Hide confirmation password' : 'Show confirmation password'}>{showConfirmPassword ? <FiEyeOff aria-hidden="true" /> : <FiEye aria-hidden="true" />}</button></span>
-          {errors.confirmPassword && <span className="field-error" id="register-confirm-error">{errors.confirmPassword}</span>}
+          <span className="password-control">
+            <input id="register-confirm-password" name="confirmPassword" 
+            type={showConfirmPassword ? 'text' : 'password'} autoComplete="new-password"
+             value={values.confirmPassword} onChange={(event) =>
+               updateField('confirmPassword', event.target.value)} 
+               aria-invalid={Boolean(errors.confirmPassword)} aria-describedby={errors.confirmPassword ? 
+                'register-confirm-error' : undefined} />
+                <button className="password-toggle" type="button" onClick={(
+
+          ) => setShowConfirmPassword((visible) => !visible)} aria-label={showConfirmPassword ? 
+          'Hide confirmation password' : 'Show confirmation password'}>{showConfirmPassword ?
+           <FiEyeOff aria-hidden="true" /> : <FiEye aria-hidden="true" />}</button></span>
+          {errors.confirmPassword && <span className="field-error"
+           id="register-confirm-error">{errors.confirmPassword}</span>}
         </label>
-        <button className="auth-submit" type="submit" disabled={loading}>{loading ? 'Creating account…' : 'Create account'}</button>
+        <button className="auth-submit"
+         type="submit" disabled={loading}>{loading ? 
+         'Creating account…' : 'Create account'}
+         </button>
       </form>
     </AuthLayout>
   )

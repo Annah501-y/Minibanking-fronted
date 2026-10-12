@@ -1,4 +1,4 @@
-import { apiRequest } from './apiClient.js'
+import { apiRequest } from '../../services/apiClient.js'
 
 export const transactionService = {
   getHistory({ page, size, type, from, to }) {

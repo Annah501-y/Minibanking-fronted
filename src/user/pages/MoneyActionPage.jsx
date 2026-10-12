@@ -4,14 +4,14 @@ import { Link } from 'react-router-dom'
 import AuthenticatedLayout from '../components/AuthenticatedLayout.jsx'
 import { accountService } from '../services/accountService.js'
 import { transactionService } from '../services/transactionService.js'
-import { formatCurrency, formatDateTime, formatTransactionType } from '../utils/formatters.js'
-import { validateMoneyAmount, validateTransfer } from '../utils/validation.js'
-import '../styles/transactions.css'
+import { formatCurrency, formatDateTime, formatTransactionType } from '../../utils/formatters.js'
+import { validateMoneyAmount, validateTransfer } from '../../utils/validation.js'
+import '../../user_styles/transactions.css'
 
 const ACTIONS = {
   deposit: {
     title: 'Deposit funds',
-    description: 'Add funds to your account securely.',
+    description: 'Add funds to your account.',
     button: 'Deposit funds',
     icon: FiArrowDownLeft,
     submit: (amount) => transactionService.deposit(amount),
@@ -40,11 +40,11 @@ function TransactionResult({ result, action }) {
 
   return (
     <section className="action-result" role="status" aria-live="polite">
-      <div className="action-result-heading"><span className="result-check"><FiCheck aria-hidden="true" /></span><div><strong>{action === 'transfer' ? 'Transfer completed' : action === 'deposit' ? 'Deposit completed' : 'Withdrawal completed'}</strong><p>The banking API accepted the transaction.</p></div></div>
+      <div className="action-result-heading"><span className="result-check"><FiCheck aria-hidden="true" /></span><div><strong>{action === 'transfer' ? 'Transfer completed' : action === 'deposit' ? 'Deposit completed' : 'Withdrawal completed'}</strong></div></div>
       {entries.length > 0 && <div className="action-result-list">{entries.map(([label, transaction]) => (
         <div className="action-result-row" key={label}><span>{label}</span><div><strong>{formatCurrency(transaction.amount)}</strong><small>{formatTransactionType(transaction.type)}{transaction.transactionId ? ` · #${transaction.transactionId}` : ''}</small>{transaction.balanceAfter !== undefined && <small>Balance after: {formatCurrency(transaction.balanceAfter)}</small>}{transaction.createdAt && <small>{formatDateTime(transaction.createdAt)}</small>}</div></div>
       ))}</div>}
-      {entries.length === 0 && <p className="result-note">Transaction details were not included in the API response.</p>}
+      {entries.length === 0 && <p className="result-note">Transaction details were not included.</p>}
       <Link className="result-link" to="/dashboard">Return to account overview <FiArrowRight aria-hidden="true" /></Link>
     </section>
   )
@@ -129,10 +129,9 @@ export default function MoneyActionPage({ action }) {
             <label className="money-field" htmlFor="transaction-amount">Amount in Tanzanian shillings<span className="money-input-wrap"><span className="currency-prefix">TSh</span><input id="transaction-amount" name="amount" type="number" inputMode="decimal" min="0.01" step="0.01" placeholder="0.00" value={amount} onChange={(event) => updateAmount(event.target.value)} aria-invalid={Boolean(errors.amount)} aria-describedby={errors.amount ? 'transaction-amount-error' : 'amount-hint'} /></span>{errors.amount && <span className="field-error" id="transaction-amount-error">{errors.amount}</span>}{!errors.amount && <span className="money-hint" id="amount-hint">Enter an amount greater than zero.</span>}</label>
             <button className="money-submit" type="submit" disabled={submitting}><ActionIcon aria-hidden="true" />{submitting ? 'Processing…' : config.button}</button>
           </form>
-          <p className="money-security-note">Transactions are processed securely by the banking service.</p>
         </section>
 
-        <aside className="action-help-card"><span className="help-icon"><FiCreditCard aria-hidden="true" /></span><h2>{action === 'transfer' ? 'Before you transfer' : action === 'deposit' ? 'About deposits' : 'About withdrawals'}</h2><p>{action === 'transfer' ? 'Check the recipient account number and amount before submitting. Transfers are recorded by the banking service.' : 'Your account balance and transaction history update after the banking service accepts the request.'}</p><div className="help-divider" /><div className="help-detail"><span>Minimum transaction</span><strong>TSh 0.01</strong></div>{action === 'transfer' && <div className="help-detail"><span>Recipient account</span><strong>10 digits</strong></div>}</aside>
+        <aside className="action-help-card"><span className="help-icon"><FiCreditCard aria-hidden="true" /></span><h2>{action === 'transfer' ? 'Before you transfer' : action === 'deposit' ? 'Deposit limits' : 'Withdrawal limits'}</h2>{action === 'transfer' && <p>Confirm the account number and amount before sending.</p>}<div className="help-divider" /><div className="help-detail"><span>Minimum transaction</span><strong>TSh 0.01</strong></div>{action === 'transfer' && <div className="help-detail"><span>Recipient account</span><strong>10 digits</strong></div>}</aside>
       </div>
       <TransactionResult result={result} action={action} />
     </AuthenticatedLayout>

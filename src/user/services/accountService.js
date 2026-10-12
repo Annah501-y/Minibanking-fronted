@@ -1,4 +1,4 @@
-import { apiRequest } from './apiClient.js'
+import { apiRequest } from '../../services/apiClient.js'
 
 const RECENT_ACTIVITY_SIZE = 5
 

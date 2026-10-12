@@ -3,8 +3,8 @@ import { FiArrowDownLeft, FiArrowUpRight, FiCreditCard, FiRefreshCw, FiRepeat, F
 import { Link } from 'react-router-dom'
 import AuthenticatedLayout from '../components/AuthenticatedLayout.jsx'
 import { accountService } from '../services/accountService.js'
-import { formatCurrency, formatDateTime, formatTransactionType, getTransactionDirection } from '../utils/formatters.js'
-import '../styles/dashboard.css'
+import { formatCurrency, formatDateTime, formatTransactionType, getTransactionDirection } from '../../utils/formatters.js'
+import '../../user_styles/dashboard.css'
 
 function RecentActivity({ transactions, loading, error }) {
   if (loading) {
@@ -102,7 +102,6 @@ export default function DashboardPage() {
           <div className="account-detail-heading"><span className="detail-icon"><FiUser aria-hidden="true" /></span><div><span>ACCOUNT HOLDER</span><strong>{loading ? 'Loading…' : holderName}</strong></div></div>
           <div className="detail-divider" />
           <div className="account-detail-heading"><span className="detail-icon card-detail-icon"><FiCreditCard aria-hidden="true" /></span><div><span>ACCOUNT NUMBER</span><strong className="detail-account-number">{loading ? 'Loading…' : accountNumber}</strong></div></div>
-          <div className="account-detail-note"><span className="account-status-dot" /> Account details from your bank</div>
         </article>
       </section>
 
@@ -113,11 +112,9 @@ export default function DashboardPage() {
       </nav>
 
       <section className="activity-panel" aria-labelledby="activity-title">
-        <div className="activity-heading"><div><span className="dashboard-eyebrow">ACCOUNT ACTIVITY</span><h2 id="activity-title">Recent transactions</h2><p>Your latest activity, newest first.</p></div><span className="activity-count">{loading ? '—' : activityError ? 'Unavailable' : `${transactions.length} recent`}</span></div>
+        <div className="activity-heading"><div><span className="dashboard-eyebrow">ACCOUNT ACTIVITY</span><h2 id="activity-title">Recent transactions</h2></div><span className="activity-count">{loading ? '—' : activityError ? 'Unavailable' : `${transactions.length} recent`}</span></div>
         <RecentActivity transactions={transactions} loading={loading} error={activityError} />
-        {!loading && transactions.length > 0 && <div className="activity-panel-footer"><span>Showing the latest activity returned by your account.</span><span className="activity-live"><span /> Live account data</span></div>}
       </section>
-      <footer className="dashboard-footer">MiniBank <span>•</span> Personal account</footer>
     </AuthenticatedLayout>
   )
 }

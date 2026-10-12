@@ -2,8 +2,8 @@ import { useState } from 'react'
 import { FiEye, FiEyeOff } from 'react-icons/fi'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import AuthLayout from '../components/AuthLayout.jsx'
-import { useAuth } from '../context/useAuth.js'
-import { validateLogin } from '../utils/validation.js'
+import { useAuth } from '../../context/useAuth.js'
+import { validateLogin } from '../../utils/validation.js'
 
 export default function LoginPage() {
   const { login } = useAuth()
@@ -44,7 +44,7 @@ export default function LoginPage() {
   return (
     <AuthLayout
       heading="Welcome back"
-      description="Sign in to securely access your account."
+      description="Sign in to access your account."
       footer={<>New to MiniBank? <Link to="/register">Create an account</Link></>}
     >
       {registration && <div className="auth-notice" role="status">Account created for {registration.fullName || registration.email}. You can now sign in{registration.accountNumber ? ` with account ${registration.accountNumber}` : ''}.</div>}

@@ -2,8 +2,8 @@ import { useEffect, useState } from 'react'
 import { FiCalendar, FiFilter, FiRefreshCw } from 'react-icons/fi'
 import AuthenticatedLayout from '../components/AuthenticatedLayout.jsx'
 import { transactionService } from '../services/transactionService.js'
-import { formatCurrency, formatDateTime, formatTransactionType, getTransactionDirection } from '../utils/formatters.js'
-import '../styles/transactions.css'
+import { formatCurrency, formatDateTime, formatTransactionType, getTransactionDirection } from '../../utils/formatters.js'
+import '../../user_styles/transactions.css'
 
 const INITIAL_FILTERS = { type: '', from: '', to: '' }
 const INITIAL_PAGE = { content: [], page: 0, size: 10, totalElements: 0, totalPages: 0 }
